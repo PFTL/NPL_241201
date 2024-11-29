@@ -1,13 +1,11 @@
 from serial import Serial
 from time import sleep
-import matplotlib.pyplot as plt
 import numpy as np
 
 
 class SerialDAQ:
-    def __init__(self, port, resistance=220):
+    def __init__(self, port):
         self.port = port
-        self.resistance = resistance
         self.dev = None  # This gets a value in initialise 
 
     def initialise(self):
@@ -16,6 +14,10 @@ class SerialDAQ:
 
     def query(self, message):
         out = message + '\n'
+        
+        if self.dev is None:
+            raise Exception('Device is not initialized')
+
         self.dev.write(out.encode('ascii'))
 
         ans = self.dev.readline()
@@ -28,22 +30,17 @@ class SerialDAQ:
         return self.query('*IDN?')
 
     def set_output(self, channel_out, value):
-        if value > 3.3:
-            raise Exception(f'Value {value} outside range 0-3.3V')
-        value_out = int(value * 4095 / 3.3)
-        out = f'OUT:CH{channel_out} {value_out}'
+        if value > 4095:
+            raise Exception(f'Value {value} outside range 0-4095')
+        
+        out = f'OUT:CH{channel_out} {value}'
         self.query(out)
 
     def get_input(self, channel_in):
         out = f'MEAS:CH{channel_in}?'
-        volt_int = int(self.query(out))
-        volt = volt_int * 3.3 / 1023
-        current = volt / self.resistance
-        return current
+        return int(self.query(out))
 
     def finalise(self):
-        self.query('OUT:CH0 0')
-        self.query('OUT:CH1 0')
         self.dev.close()
 
 
@@ -74,5 +71,3 @@ if __name__ == '__main__':
         serial_dev.finalise()
 
     print(voltages, currents)
-    plt.plot(voltages, currents)
-    plt.show()
