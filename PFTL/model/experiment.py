@@ -9,6 +9,7 @@ from time import sleep
 import yaml
 
 from PFTL.model.daq import DAQ
+from PFTL.model.dummy_daq import DummyDAQ
 
 
 class Experiment:
@@ -28,8 +29,12 @@ class Experiment:
             self.config = yaml.load(f, Loader=yaml.FullLoader)
 
     def initialise(self):
-        self.daq = DAQ(self.config['DAQ']['port'])
-        self.daq.initialise()
+        if self.config['DAQ']['model'] == "Real":
+            self.daq = DAQ(self.config['DAQ']['port'])
+            self.daq.initialise()
+        elif self.config['DAQ']['model'] == "Dummy":
+            self.daq = DummyDAQ(self.config['DAQ']['port'])
+            self.daq.initialise()
 
     def start_scan(self):
         if self.scan_running:

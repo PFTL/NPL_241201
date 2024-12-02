@@ -2,6 +2,7 @@ User:
   name: Aquiles
 
 DAQ:
+  model: Dummy  # (Or Real)
   port: 11401
   resistance: 220  # In Ohms
 
