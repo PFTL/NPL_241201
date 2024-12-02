@@ -1,0 +1,17 @@
+User:
+  name: Aquiles
+
+DAQ:
+  port: 11201
+  resistance: 220  # In Ohms
+
+Scan:
+  start: 0  # In Volts
+  stop: 3.3
+  step: 0.1
+  channel_out: 0
+  channel_in: 0
+
+Saving:
+  folder: /Users/aquiles/Data
+  filename: IV_data.txt

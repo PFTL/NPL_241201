@@ -23,6 +23,8 @@ class DAQ:
         self.driver.set_output(channel, volts_int)
 
     def read_voltage(self, channel):
+        """Returns the value in volts"""
+        
         volts_int = self.driver.get_input(channel)
         return volts_int * 3.3 / 1023
 
