@@ -1,6 +1,6 @@
 import pathlib
 from PyQt5.QtCore import QTimer
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog
 from PyQt5 import uic
 
 from PFTL.model.experiment import Experiment
@@ -20,7 +20,8 @@ class ScanWindow(QMainWindow):
         self.stop_button.clicked.connect(self.experiment.stop_scan)
         self.plot_button.clicked.connect(self.experiment.make_plot)
 
-        self.actionSave.triggered.connect(self.experiment.save_data)
+        self.actionSave.triggered.connect(self.save_data)
+        self.save_button.clicked.connect(self.save_data)
 
         self.start_line.setText(str(self.experiment.config['Scan']['start']))
         self.stop_line.setText(str(self.experiment.config['Scan']['stop']))
@@ -29,7 +30,8 @@ class ScanWindow(QMainWindow):
         self.plot = self.plot_widget.plot([0, ], [0, ])
         self.update_timer = QTimer()
         self.update_timer.timeout.connect(self.update_plot)
-        self.update_timer.start(100)
+        self.update_timer.timeout.connect(self.update_status)
+        self.update_timer.start(30)
 
     def start_pressed(self):
         print('Start Pressed')
@@ -39,10 +41,26 @@ class ScanWindow(QMainWindow):
             'step': float(self.step_line.text()),
         })
         self.experiment.start_scan()
+        self.status_progress.setMaximum(len(self.experiment.currents))
         self.plot.setData(self.experiment.voltages_out, self.experiment.currents)
+
+    def save_data(self):
+        directory = QFileDialog.getExistingDirectory(self, 'Select Folder', 
+                                    self.experiment.config['Saving']['folder'])
+
+        if directory is "":
+            return
+
+        self.experiment.config['Saving']['folder'] = directory
+        self.experiment.save_data()
 
     def update_plot(self):
         self.plot.setData(self.experiment.voltages_out, self.experiment.currents)
+    
+    def update_status(self):
+        status = f"Currently measuring: {self.experiment.i}/{len(self.experiment.currents)}. Last Value: {self.experiment.last_current}"
+        self.status_line.setText(status)
+        self.status_progress.setValue(self.experiment.i)
 
 if __name__ == "__main__":
     exp = Experiment()
