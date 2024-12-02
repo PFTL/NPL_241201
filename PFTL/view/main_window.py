@@ -17,7 +17,10 @@ class ScanWindow(QMainWindow):
         uic.loadUi(str(view_folder/'main_window.ui'), self)
 
         self.start_button.clicked.connect(self.start_pressed)
+        self.stop_button.clicked.connect(self.experiment.stop_scan)
         self.plot_button.clicked.connect(self.experiment.make_plot)
+
+        self.actionSave.triggered.connect(self.experiment.save_data)
 
         self.start_line.setText(str(self.experiment.config['Scan']['start']))
         self.stop_line.setText(str(self.experiment.config['Scan']['stop']))

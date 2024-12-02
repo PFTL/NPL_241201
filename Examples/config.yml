@@ -2,7 +2,7 @@ User:
   name: Aquiles
 
 DAQ:
-  port: 11201
+  port: 11401
   resistance: 220  # In Ohms
 
 Scan:
@@ -14,4 +14,4 @@ Scan:
 
 Saving:
   folder: /Users/aquiles/Data
-  filename: IV_data.txt
+  filename: IV_data
